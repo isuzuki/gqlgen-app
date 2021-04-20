@@ -74,9 +74,6 @@ type QueryResolver interface {
 type TodoResolver interface {
 	User(ctx context.Context, obj *model.Todo) (*model.User, error)
 }
-type __DirectiveResolver interface {
-	IsRepeatable(ctx context.Context, obj *introspection.Directive) (bool, error)
-}
 
 type executableSchema struct {
 	resolvers  ResolverRoot
@@ -1974,14 +1971,14 @@ func (ec *executionContext) ___Directive(ctx context.Context, sel ast.SelectionS
 		case "name":
 			out.Values[i] = ec.___Directive_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "description":
 			out.Values[i] = ec.___Directive_description(ctx, field, obj)
 		case "locations":
 			out.Values[i] = ec.___Directive_locations(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "args":
 			out.Values[i] = ec.___Directive_args(ctx, field, obj)
