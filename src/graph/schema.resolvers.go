@@ -7,15 +7,26 @@ import (
 	"app/graph/generated"
 	"app/graph/model"
 	"context"
-	"fmt"
+	"math/rand"
+	"strconv"
 )
 
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	panic(fmt.Errorf("not implemented"))
+	todo := &model.Todo{
+		ID:   strconv.Itoa(rand.Int()),
+		Text: input.Text,
+		User: &model.User{
+			ID:   input.UserID,
+			Name: input.UserID + " name",
+		},
+	}
+
+	r.todos = append(r.todos, todo)
+	return todo, nil
 }
 
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented"))
+	return r.todos, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
