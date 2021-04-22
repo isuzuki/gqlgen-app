@@ -5,8 +5,15 @@
 type Item {
   id: ID!
   name: String!
+  category: Category!
+}
+
+type Category {
+  id: ID!
+  name: String!
 }
 
 type Query {
   items: [Item!]!
+  categories: [Category!]!
 }

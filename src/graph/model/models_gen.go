@@ -2,7 +2,13 @@
 
 package model
 
-type Item struct {
+type Category struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
+}
+
+type Item struct {
+	ID       string    `json:"id"`
+	Name     string    `json:"name"`
+	Category *Category `json:"category"`
 }

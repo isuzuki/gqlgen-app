@@ -11,10 +11,25 @@ import (
 	"strconv"
 )
 
+func generateID() string {
+	return strconv.Itoa(rand.Int())
+}
+
 func (r *queryResolver) Items(ctx context.Context) ([]*model.Item, error) {
 	return []*model.Item{{
-		ID:   strconv.Itoa(rand.Int()),
+		ID:   generateID(),
 		Name: "item",
+		Category: &model.Category{
+			ID:   generateID(),
+			Name: "item_category",
+		},
+	}}, nil
+}
+
+func (r *queryResolver) Categories(ctx context.Context) ([]*model.Category, error) {
+	return []*model.Category{{
+		ID:   generateID(),
+		Name: "category",
 	}}, nil
 }
 
