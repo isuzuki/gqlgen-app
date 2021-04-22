@@ -5,21 +5,27 @@ package graph
 
 import (
 	"app/graph/generated"
+	"app/models"
 	"context"
 	"log"
 	"math/rand"
 	"strconv"
 )
 
-func (r *queryResolver) Items(ctx context.Context) ([]*generated.Item, error) {
-	log.Println("queryResolver: Items")
-	return []*generated.Item{{
+func (r *itemResolver) Category(ctx context.Context, obj *models.Item) (*generated.Category, error) {
+	log.Println("itemResolver: Category")
+	return &generated.Category{
 		ID:   generateID(),
-		Name: "item",
-		Category: &generated.Category{
-			ID:   generateID(),
-			Name: "item_category",
-		},
+		Name: "item_category",
+	}, nil
+}
+
+func (r *queryResolver) Items(ctx context.Context) ([]*models.Item, error) {
+	log.Println("queryResolver: Items")
+	return []*models.Item{{
+		ID:         generateID(),
+		Name:       "item",
+		CategoryID: generateID(),
 	}}, nil
 }
 
@@ -31,9 +37,13 @@ func (r *queryResolver) Categories(ctx context.Context) ([]*generated.Category, 
 	}}, nil
 }
 
+// Item returns generated.ItemResolver implementation.
+func (r *Resolver) Item() generated.ItemResolver { return &itemResolver{r} }
+
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
+type itemResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 
 // !!! WARNING !!!

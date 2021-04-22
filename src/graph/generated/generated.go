@@ -3,6 +3,7 @@
 package generated
 
 import (
+	"app/models"
 	"bytes"
 	"context"
 	"errors"
@@ -34,6 +35,7 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Item() ItemResolver
 	Query() QueryResolver
 }
 
@@ -58,8 +60,11 @@ type ComplexityRoot struct {
 	}
 }
 
+type ItemResolver interface {
+	Category(ctx context.Context, obj *models.Item) (*Category, error)
+}
 type QueryResolver interface {
-	Items(ctx context.Context) ([]*Item, error)
+	Items(ctx context.Context) ([]*models.Item, error)
 	Categories(ctx context.Context) ([]*Category, error)
 }
 
@@ -326,7 +331,7 @@ func (ec *executionContext) _Category_name(ctx context.Context, field graphql.Co
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Item_id(ctx context.Context, field graphql.CollectedField, obj *Item) (ret graphql.Marshaler) {
+func (ec *executionContext) _Item_id(ctx context.Context, field graphql.CollectedField, obj *models.Item) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -361,7 +366,7 @@ func (ec *executionContext) _Item_id(ctx context.Context, field graphql.Collecte
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Item_name(ctx context.Context, field graphql.CollectedField, obj *Item) (ret graphql.Marshaler) {
+func (ec *executionContext) _Item_name(ctx context.Context, field graphql.CollectedField, obj *models.Item) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -396,7 +401,7 @@ func (ec *executionContext) _Item_name(ctx context.Context, field graphql.Collec
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Item_category(ctx context.Context, field graphql.CollectedField, obj *Item) (ret graphql.Marshaler) {
+func (ec *executionContext) _Item_category(ctx context.Context, field graphql.CollectedField, obj *models.Item) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -407,14 +412,14 @@ func (ec *executionContext) _Item_category(ctx context.Context, field graphql.Co
 		Object:     "Item",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Category, nil
+		return ec.resolvers.Item().Category(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -461,9 +466,9 @@ func (ec *executionContext) _Query_items(ctx context.Context, field graphql.Coll
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*Item)
+	res := resTmp.([]*models.Item)
 	fc.Result = res
-	return ec.marshalNItem2ᚕᚖappᚋgraphᚋgeneratedᚐItemᚄ(ctx, field.Selections, res)
+	return ec.marshalNItem2ᚕᚖappᚋmodelsᚐItemᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_categories(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1701,7 +1706,7 @@ func (ec *executionContext) _Category(ctx context.Context, sel ast.SelectionSet,
 
 var itemImplementors = []string{"Item"}
 
-func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj *Item) graphql.Marshaler {
+func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj *models.Item) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, itemImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -1713,18 +1718,27 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 		case "id":
 			out.Values[i] = ec._Item_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "name":
 			out.Values[i] = ec._Item_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "category":
-			out.Values[i] = ec._Item_category(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Item_category(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2054,6 +2068,10 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) marshalNCategory2appᚋgraphᚋgeneratedᚐCategory(ctx context.Context, sel ast.SelectionSet, v Category) graphql.Marshaler {
+	return ec._Category(ctx, sel, &v)
+}
+
 func (ec *executionContext) marshalNCategory2ᚕᚖappᚋgraphᚋgeneratedᚐCategoryᚄ(ctx context.Context, sel ast.SelectionSet, v []*Category) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -2116,7 +2134,7 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 	return res
 }
 
-func (ec *executionContext) marshalNItem2ᚕᚖappᚋgraphᚋgeneratedᚐItemᚄ(ctx context.Context, sel ast.SelectionSet, v []*Item) graphql.Marshaler {
+func (ec *executionContext) marshalNItem2ᚕᚖappᚋmodelsᚐItemᚄ(ctx context.Context, sel ast.SelectionSet, v []*models.Item) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -2140,7 +2158,7 @@ func (ec *executionContext) marshalNItem2ᚕᚖappᚋgraphᚋgeneratedᚐItemᚄ
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNItem2ᚖappᚋgraphᚋgeneratedᚐItem(ctx, sel, v[i])
+			ret[i] = ec.marshalNItem2ᚖappᚋmodelsᚐItem(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -2153,7 +2171,7 @@ func (ec *executionContext) marshalNItem2ᚕᚖappᚋgraphᚋgeneratedᚐItemᚄ
 	return ret
 }
 
-func (ec *executionContext) marshalNItem2ᚖappᚋgraphᚋgeneratedᚐItem(ctx context.Context, sel ast.SelectionSet, v *Item) graphql.Marshaler {
+func (ec *executionContext) marshalNItem2ᚖappᚋmodelsᚐItem(ctx context.Context, sel ast.SelectionSet, v *models.Item) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
