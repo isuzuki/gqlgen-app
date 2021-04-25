@@ -2,15 +2,19 @@
 #
 # https://gqlgen.com/getting-started/
 
+scalar Time
+
 type Item {
   id: ID!
   name: String!
   category: Category!
+  createdAt: Time!
 }
 
 type Category {
   id: ID!
   name: String!
+  createdAt: Time!
 }
 
 type Query {

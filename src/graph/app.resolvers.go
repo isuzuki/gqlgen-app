@@ -10,13 +10,15 @@ import (
 	"log"
 	"math/rand"
 	"strconv"
+	"time"
 )
 
 func (r *itemResolver) Category(ctx context.Context, obj *models.Item) (*generated.Category, error) {
 	log.Println("itemResolver: Category")
 	return &generated.Category{
-		ID:   generateID(),
-		Name: "item_category",
+		ID:        generateID(),
+		Name:      "item_category",
+		CreatedAt: time.Now(),
 	}, nil
 }
 
@@ -26,14 +28,16 @@ func (r *queryResolver) Items(ctx context.Context) ([]*models.Item, error) {
 		ID:         generateID(),
 		Name:       "item",
 		CategoryID: generateID(),
+		CreatedAt:  time.Now(),
 	}}, nil
 }
 
 func (r *queryResolver) Categories(ctx context.Context) ([]*generated.Category, error) {
 	log.Println("queryResolver: Categories")
 	return []*generated.Category{{
-		ID:   generateID(),
-		Name: "category",
+		ID:        generateID(),
+		Name:      "category",
+		CreatedAt: time.Now(),
 	}}, nil
 }
 
@@ -43,6 +47,7 @@ func (r *queryResolver) Item(ctx context.Context, id string) (*models.Item, erro
 		ID:         id,
 		Name:       "item_" + id,
 		CategoryID: generateID(),
+		CreatedAt:  time.Now(),
 	}
 	return item, nil
 }
