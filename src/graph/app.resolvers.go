@@ -37,6 +37,16 @@ func (r *queryResolver) Categories(ctx context.Context) ([]*generated.Category, 
 	}}, nil
 }
 
+func (r *queryResolver) Item(ctx context.Context, id string) (*models.Item, error) {
+	log.Println("queryResolver: Item")
+	item := &models.Item{
+		ID:         id,
+		Name:       "item_" + id,
+		CategoryID: generateID(),
+	}
+	return item, nil
+}
+
 // Item returns generated.ItemResolver implementation.
 func (r *Resolver) Item() generated.ItemResolver { return &itemResolver{r} }
 

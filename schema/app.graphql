@@ -16,4 +16,5 @@ type Category {
 type Query {
   items: [Item!]!
   categories: [Category!]!
+  item(id: ID!): Item
 }
