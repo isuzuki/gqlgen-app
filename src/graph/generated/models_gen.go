@@ -3,11 +3,13 @@
 package generated
 
 import (
+	"app/models"
 	"time"
 )
 
 type Category struct {
-	ID        string    `json:"id"`
-	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"createdAt"`
+	ID        string         `json:"id"`
+	Name      string         `json:"name"`
+	Items     []*models.Item `json:"items"`
+	CreatedAt time.Time      `json:"createdAt"`
 }

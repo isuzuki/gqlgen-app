@@ -7,6 +7,8 @@ import (
 	"app/graph/generated"
 	"app/models"
 	"context"
+	"fmt"
+	"github.com/99designs/gqlgen/graphql"
 	"log"
 	"math/rand"
 	"strconv"
@@ -34,10 +36,35 @@ func (r *queryResolver) Items(ctx context.Context) ([]*models.Item, error) {
 
 func (r *queryResolver) Categories(ctx context.Context) ([]*generated.Category, error) {
 	log.Println("queryResolver: Categories")
+
+	allItems := []*models.Item{{
+		ID:         generateID(),
+		Name:       "item_" + generateID(),
+		CategoryID: generateID(),
+		CreatedAt:  time.Now(),
+	}}
+
+	catItems := make([]*models.Item, 0)
+	for _, f := range graphql.CollectFieldsCtx(ctx, nil) {
+		for _, a := range f.Arguments {
+			if a.Name == "createdSince" {
+				t, _ := time.Parse(time.RFC3339, a.Value.Raw)
+				for _, i := range allItems {
+					if i.CreatedAt.After(t) {
+						catItems = append(catItems, i)
+					}
+				}
+			}
+
+			fmt.Println(a.Name, a.Value)
+		}
+	}
+
 	return []*generated.Category{{
 		ID:        generateID(),
 		Name:      "category",
 		CreatedAt: time.Now(),
+		Items:     catItems,
 	}}, nil
 }
 
