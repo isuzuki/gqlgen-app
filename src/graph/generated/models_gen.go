@@ -18,3 +18,13 @@ type CreateItemInput struct {
 	Name       string `json:"name"`
 	CategoryID string `json:"categoryId"`
 }
+
+type DeleteItemInput struct {
+	ID string `json:"id"`
+}
+
+type UpdateItemInput struct {
+	ID         string `json:"id"`
+	Name       string `json:"name"`
+	CategoryID string `json:"categoryId"`
+}

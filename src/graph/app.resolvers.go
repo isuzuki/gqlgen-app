@@ -7,6 +7,7 @@ import (
 	"app/graph/generated"
 	"app/models"
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"math/rand"
@@ -35,6 +36,48 @@ func (r *mutationResolver) CreateItem(ctx context.Context, input generated.Creat
 	}
 	r.items = append(r.items, item)
 	return item, nil
+}
+
+func (r *mutationResolver) UpdateItem(ctx context.Context, input generated.UpdateItemInput) (*models.Item, error) {
+	log.Println("mutationResolver: UpdateItem")
+	ok := false
+	updated := &models.Item{}
+	for i, item := range r.items {
+		if item.ID == input.ID {
+			item.Name = input.Name
+			item.CategoryID = input.CategoryID
+			r.items[i] = item
+
+			updated = item
+			ok = true
+			break
+		}
+	}
+
+	if !ok {
+		return nil, errors.New("not found")
+	}
+	return updated, nil
+}
+
+func (r *mutationResolver) DeleteItem(ctx context.Context, input generated.DeleteItemInput) (string, error) {
+	log.Println("mutationResolver: DeleteItem")
+	ok := false
+	deletedID := ""
+	for i, item := range r.items {
+		if item.ID == input.ID {
+			r.items = append(r.items[:i], r.items[i+1:]...)
+
+			deletedID = item.ID
+			ok = true
+			break
+		}
+	}
+
+	if !ok {
+		return "", errors.New("not found")
+	}
+	return deletedID, nil
 }
 
 func (r *queryResolver) Items(ctx context.Context) ([]*models.Item, error) {

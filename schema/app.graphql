@@ -29,6 +29,18 @@ input CreateItemInput {
   categoryId: ID!
 }
 
+input UpdateItemInput {
+  id: ID!
+  name: String!
+  categoryId: ID!
+}
+
+input DeleteItemInput {
+  id: ID!
+}
+
 type Mutation {
   createItem(input: CreateItemInput!): Item!
+  updateItem(input: UpdateItemInput!): Item!
+  deleteItem(input: DeleteItemInput!): ID!
 }
