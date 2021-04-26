@@ -8,11 +8,12 @@ import (
 	"app/models"
 	"context"
 	"fmt"
-	"github.com/99designs/gqlgen/graphql"
 	"log"
 	"math/rand"
 	"strconv"
 	"time"
+
+	"github.com/99designs/gqlgen/graphql"
 )
 
 func (r *itemResolver) Category(ctx context.Context, obj *models.Item) (*generated.Category, error) {
@@ -24,14 +25,21 @@ func (r *itemResolver) Category(ctx context.Context, obj *models.Item) (*generat
 	}, nil
 }
 
+func (r *mutationResolver) CreateItem(ctx context.Context, input generated.CreateItemInput) (*models.Item, error) {
+	log.Println("mutationResolver: CreateItem")
+	item := &models.Item{
+		ID:         generateID(),
+		Name:       input.Name,
+		CategoryID: input.CategoryID,
+		CreatedAt:  time.Now(),
+	}
+	r.items = append(r.items, item)
+	return item, nil
+}
+
 func (r *queryResolver) Items(ctx context.Context) ([]*models.Item, error) {
 	log.Println("queryResolver: Items")
-	return []*models.Item{{
-		ID:         generateID(),
-		Name:       "item",
-		CategoryID: generateID(),
-		CreatedAt:  time.Now(),
-	}}, nil
+	return r.items, nil
 }
 
 func (r *queryResolver) Categories(ctx context.Context) ([]*generated.Category, error) {
@@ -82,10 +90,14 @@ func (r *queryResolver) Item(ctx context.Context, id string) (*models.Item, erro
 // Item returns generated.ItemResolver implementation.
 func (r *Resolver) Item() generated.ItemResolver { return &itemResolver{r} }
 
+// Mutation returns generated.MutationResolver implementation.
+func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
+
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type itemResolver struct{ *Resolver }
+type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 
 // !!! WARNING !!!

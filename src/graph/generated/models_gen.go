@@ -13,3 +13,8 @@ type Category struct {
 	Items     []*models.Item `json:"items"`
 	CreatedAt time.Time      `json:"createdAt"`
 }
+
+type CreateItemInput struct {
+	Name       string `json:"name"`
+	CategoryID string `json:"categoryId"`
+}

@@ -23,3 +23,12 @@ type Query {
   categories: [Category!]!
   item(id: ID!): Item
 }
+
+input CreateItemInput {
+  name: String!
+  categoryId: ID!
+}
+
+type Mutation {
+  createItem(input: CreateItemInput!): Item!
+}
