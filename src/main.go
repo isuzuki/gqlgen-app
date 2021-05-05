@@ -3,6 +3,7 @@ package main
 import (
 	"app/graph"
 	"app/graph/generated"
+	"app/models"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"log"
@@ -35,6 +36,9 @@ func initDB() {
 	if err != nil {
 		log.Fatalln("connection failed.", err)
 	}
+
+	db.LogMode(true)
+	db.AutoMigrate(&models.Item{})
 
 	defer db.Close()
 }
