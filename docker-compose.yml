@@ -7,3 +7,12 @@ services:
       - "8080:8080"
     volumes:
       - ./src:/go/src/app
+  db:
+    image: postgres:13
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: gqlgen_password
+      POSTGRES_USER: gqlgen_user
+      POSTGRES_DB: gqlgen_db
+    ports:
+      - "5432:5432"
