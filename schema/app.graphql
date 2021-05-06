@@ -8,6 +8,7 @@ type Item {
   id: ID!
   name: String!
   category: Category!
+  color: Color!
   createdAt: Time!
 }
 
@@ -16,6 +17,12 @@ type Category {
   name: String!
   items(createdSince: Time): [Item!]!
   createdAt: Time!
+}
+
+enum Color {
+  RED
+  GREEN
+  BLUE
 }
 
 type Query {

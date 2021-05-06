@@ -5,7 +5,7 @@ package graph
 
 import (
 	"app/graph/generated"
-	"app/models"
+	"app/model"
 	"context"
 	"errors"
 	"fmt"
@@ -17,18 +17,18 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 )
 
-func (r *itemResolver) Category(ctx context.Context, obj *models.Item) (*generated.Category, error) {
+func (r *itemResolver) Category(ctx context.Context, obj *model.Item) (*model.Category, error) {
 	log.Println("itemResolver: Category")
-	return &generated.Category{
+	return &model.Category{
 		ID:        generateID(),
 		Name:      "item_category",
 		CreatedAt: time.Now(),
 	}, nil
 }
 
-func (r *mutationResolver) CreateItem(ctx context.Context, input generated.CreateItemInput) (*models.Item, error) {
+func (r *mutationResolver) CreateItem(ctx context.Context, input model.CreateItemInput) (*model.Item, error) {
 	log.Println("mutationResolver: CreateItem")
-	item := &models.Item{
+	item := &model.Item{
 		ID:         generateID(),
 		Name:       input.Name,
 		CategoryID: input.CategoryID,
@@ -38,10 +38,10 @@ func (r *mutationResolver) CreateItem(ctx context.Context, input generated.Creat
 	return item, nil
 }
 
-func (r *mutationResolver) UpdateItem(ctx context.Context, input generated.UpdateItemInput) (*models.Item, error) {
+func (r *mutationResolver) UpdateItem(ctx context.Context, input model.UpdateItemInput) (*model.Item, error) {
 	log.Println("mutationResolver: UpdateItem")
 	ok := false
-	updated := &models.Item{}
+	updated := &model.Item{}
 	for i, item := range r.items {
 		if item.ID == input.ID {
 			item.Name = input.Name
@@ -60,7 +60,7 @@ func (r *mutationResolver) UpdateItem(ctx context.Context, input generated.Updat
 	return updated, nil
 }
 
-func (r *mutationResolver) DeleteItem(ctx context.Context, input generated.DeleteItemInput) (string, error) {
+func (r *mutationResolver) DeleteItem(ctx context.Context, input model.DeleteItemInput) (string, error) {
 	log.Println("mutationResolver: DeleteItem")
 	ok := false
 	deletedID := ""
@@ -80,15 +80,15 @@ func (r *mutationResolver) DeleteItem(ctx context.Context, input generated.Delet
 	return deletedID, nil
 }
 
-func (r *queryResolver) Items(ctx context.Context) ([]*models.Item, error) {
+func (r *queryResolver) Items(ctx context.Context) ([]*model.Item, error) {
 	log.Println("queryResolver: Items")
 	return r.items, nil
 }
 
-func (r *queryResolver) Categories(ctx context.Context) ([]*generated.Category, error) {
+func (r *queryResolver) Categories(ctx context.Context) ([]*model.Category, error) {
 	log.Println("queryResolver: Categories")
 
-	catItems := make([]*models.Item, 0)
+	catItems := make([]*model.Item, 0)
 	for _, f := range graphql.CollectFieldsCtx(ctx, nil) {
 		for _, a := range f.Arguments {
 			if a.Name == "createdSince" {
@@ -104,7 +104,7 @@ func (r *queryResolver) Categories(ctx context.Context) ([]*generated.Category, 
 		}
 	}
 
-	return []*generated.Category{{
+	return []*model.Category{{
 		ID:        generateID(),
 		Name:      "category",
 		CreatedAt: time.Now(),
@@ -112,9 +112,9 @@ func (r *queryResolver) Categories(ctx context.Context) ([]*generated.Category, 
 	}}, nil
 }
 
-func (r *queryResolver) Item(ctx context.Context, id string) (*models.Item, error) {
+func (r *queryResolver) Item(ctx context.Context, id string) (*model.Item, error) {
 	log.Println("queryResolver: Item")
-	item := &models.Item{
+	item := &model.Item{
 		ID:         id,
 		Name:       "item_" + id,
 		CategoryID: generateID(),

@@ -3,7 +3,7 @@
 package generated
 
 import (
-	"app/models"
+	"app/model"
 	"bytes"
 	"context"
 	"errors"
@@ -54,15 +54,16 @@ type ComplexityRoot struct {
 
 	Item struct {
 		Category  func(childComplexity int) int
+		Color     func(childComplexity int) int
 		CreatedAt func(childComplexity int) int
 		ID        func(childComplexity int) int
 		Name      func(childComplexity int) int
 	}
 
 	Mutation struct {
-		CreateItem func(childComplexity int, input CreateItemInput) int
-		DeleteItem func(childComplexity int, input DeleteItemInput) int
-		UpdateItem func(childComplexity int, input UpdateItemInput) int
+		CreateItem func(childComplexity int, input model.CreateItemInput) int
+		DeleteItem func(childComplexity int, input model.DeleteItemInput) int
+		UpdateItem func(childComplexity int, input model.UpdateItemInput) int
 	}
 
 	Query struct {
@@ -73,17 +74,17 @@ type ComplexityRoot struct {
 }
 
 type ItemResolver interface {
-	Category(ctx context.Context, obj *models.Item) (*Category, error)
+	Category(ctx context.Context, obj *model.Item) (*model.Category, error)
 }
 type MutationResolver interface {
-	CreateItem(ctx context.Context, input CreateItemInput) (*models.Item, error)
-	UpdateItem(ctx context.Context, input UpdateItemInput) (*models.Item, error)
-	DeleteItem(ctx context.Context, input DeleteItemInput) (string, error)
+	CreateItem(ctx context.Context, input model.CreateItemInput) (*model.Item, error)
+	UpdateItem(ctx context.Context, input model.UpdateItemInput) (*model.Item, error)
+	DeleteItem(ctx context.Context, input model.DeleteItemInput) (string, error)
 }
 type QueryResolver interface {
-	Items(ctx context.Context) ([]*models.Item, error)
-	Categories(ctx context.Context) ([]*Category, error)
-	Item(ctx context.Context, id string) (*models.Item, error)
+	Items(ctx context.Context) ([]*model.Item, error)
+	Categories(ctx context.Context) ([]*model.Category, error)
+	Item(ctx context.Context, id string) (*model.Item, error)
 }
 
 type executableSchema struct {
@@ -141,6 +142,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Item.Category(childComplexity), true
 
+	case "Item.color":
+		if e.complexity.Item.Color == nil {
+			break
+		}
+
+		return e.complexity.Item.Color(childComplexity), true
+
 	case "Item.createdAt":
 		if e.complexity.Item.CreatedAt == nil {
 			break
@@ -172,7 +180,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateItem(childComplexity, args["input"].(CreateItemInput)), true
+		return e.complexity.Mutation.CreateItem(childComplexity, args["input"].(model.CreateItemInput)), true
 
 	case "Mutation.deleteItem":
 		if e.complexity.Mutation.DeleteItem == nil {
@@ -184,7 +192,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteItem(childComplexity, args["input"].(DeleteItemInput)), true
+		return e.complexity.Mutation.DeleteItem(childComplexity, args["input"].(model.DeleteItemInput)), true
 
 	case "Mutation.updateItem":
 		if e.complexity.Mutation.UpdateItem == nil {
@@ -196,7 +204,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateItem(childComplexity, args["input"].(UpdateItemInput)), true
+		return e.complexity.Mutation.UpdateItem(childComplexity, args["input"].(model.UpdateItemInput)), true
 
 	case "Query.categories":
 		if e.complexity.Query.Categories == nil {
@@ -298,6 +306,7 @@ type Item {
   id: ID!
   name: String!
   category: Category!
+  color: Color!
   createdAt: Time!
 }
 
@@ -306,6 +315,12 @@ type Category {
   name: String!
   items(createdSince: Time): [Item!]!
   createdAt: Time!
+}
+
+enum Color {
+  RED
+  GREEN
+  BLUE
 }
 
 type Query {
@@ -359,10 +374,10 @@ func (ec *executionContext) field_Category_items_args(ctx context.Context, rawAr
 func (ec *executionContext) field_Mutation_createItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 CreateItemInput
+	var arg0 model.CreateItemInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNCreateItemInput2appᚋgraphᚋgeneratedᚐCreateItemInput(ctx, tmp)
+		arg0, err = ec.unmarshalNCreateItemInput2appᚋmodelᚐCreateItemInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -374,10 +389,10 @@ func (ec *executionContext) field_Mutation_createItem_args(ctx context.Context, 
 func (ec *executionContext) field_Mutation_deleteItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 DeleteItemInput
+	var arg0 model.DeleteItemInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNDeleteItemInput2appᚋgraphᚋgeneratedᚐDeleteItemInput(ctx, tmp)
+		arg0, err = ec.unmarshalNDeleteItemInput2appᚋmodelᚐDeleteItemInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -389,10 +404,10 @@ func (ec *executionContext) field_Mutation_deleteItem_args(ctx context.Context, 
 func (ec *executionContext) field_Mutation_updateItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 UpdateItemInput
+	var arg0 model.UpdateItemInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNUpdateItemInput2appᚋgraphᚋgeneratedᚐUpdateItemInput(ctx, tmp)
+		arg0, err = ec.unmarshalNUpdateItemInput2appᚋmodelᚐUpdateItemInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -469,7 +484,7 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _Category_id(ctx context.Context, field graphql.CollectedField, obj *Category) (ret graphql.Marshaler) {
+func (ec *executionContext) _Category_id(ctx context.Context, field graphql.CollectedField, obj *model.Category) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -504,7 +519,7 @@ func (ec *executionContext) _Category_id(ctx context.Context, field graphql.Coll
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Category_name(ctx context.Context, field graphql.CollectedField, obj *Category) (ret graphql.Marshaler) {
+func (ec *executionContext) _Category_name(ctx context.Context, field graphql.CollectedField, obj *model.Category) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -539,7 +554,7 @@ func (ec *executionContext) _Category_name(ctx context.Context, field graphql.Co
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Category_items(ctx context.Context, field graphql.CollectedField, obj *Category) (ret graphql.Marshaler) {
+func (ec *executionContext) _Category_items(ctx context.Context, field graphql.CollectedField, obj *model.Category) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -576,12 +591,12 @@ func (ec *executionContext) _Category_items(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*models.Item)
+	res := resTmp.([]*model.Item)
 	fc.Result = res
-	return ec.marshalNItem2ᚕᚖappᚋmodelsᚐItemᚄ(ctx, field.Selections, res)
+	return ec.marshalNItem2ᚕᚖappᚋmodelᚐItemᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Category_createdAt(ctx context.Context, field graphql.CollectedField, obj *Category) (ret graphql.Marshaler) {
+func (ec *executionContext) _Category_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Category) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -616,7 +631,7 @@ func (ec *executionContext) _Category_createdAt(ctx context.Context, field graph
 	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Item_id(ctx context.Context, field graphql.CollectedField, obj *models.Item) (ret graphql.Marshaler) {
+func (ec *executionContext) _Item_id(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -651,7 +666,7 @@ func (ec *executionContext) _Item_id(ctx context.Context, field graphql.Collecte
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Item_name(ctx context.Context, field graphql.CollectedField, obj *models.Item) (ret graphql.Marshaler) {
+func (ec *executionContext) _Item_name(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -686,7 +701,7 @@ func (ec *executionContext) _Item_name(ctx context.Context, field graphql.Collec
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Item_category(ctx context.Context, field graphql.CollectedField, obj *models.Item) (ret graphql.Marshaler) {
+func (ec *executionContext) _Item_category(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -716,12 +731,47 @@ func (ec *executionContext) _Item_category(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*Category)
+	res := resTmp.(*model.Category)
 	fc.Result = res
-	return ec.marshalNCategory2ᚖappᚋgraphᚋgeneratedᚐCategory(ctx, field.Selections, res)
+	return ec.marshalNCategory2ᚖappᚋmodelᚐCategory(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Item_createdAt(ctx context.Context, field graphql.CollectedField, obj *models.Item) (ret graphql.Marshaler) {
+func (ec *executionContext) _Item_color(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Item",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Color, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.Color)
+	fc.Result = res
+	return ec.marshalNColor2appᚋmodelᚐColor(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Item_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -781,7 +831,7 @@ func (ec *executionContext) _Mutation_createItem(ctx context.Context, field grap
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateItem(rctx, args["input"].(CreateItemInput))
+		return ec.resolvers.Mutation().CreateItem(rctx, args["input"].(model.CreateItemInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -793,9 +843,9 @@ func (ec *executionContext) _Mutation_createItem(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*models.Item)
+	res := resTmp.(*model.Item)
 	fc.Result = res
-	return ec.marshalNItem2ᚖappᚋmodelsᚐItem(ctx, field.Selections, res)
+	return ec.marshalNItem2ᚖappᚋmodelᚐItem(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_updateItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -823,7 +873,7 @@ func (ec *executionContext) _Mutation_updateItem(ctx context.Context, field grap
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateItem(rctx, args["input"].(UpdateItemInput))
+		return ec.resolvers.Mutation().UpdateItem(rctx, args["input"].(model.UpdateItemInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -835,9 +885,9 @@ func (ec *executionContext) _Mutation_updateItem(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*models.Item)
+	res := resTmp.(*model.Item)
 	fc.Result = res
-	return ec.marshalNItem2ᚖappᚋmodelsᚐItem(ctx, field.Selections, res)
+	return ec.marshalNItem2ᚖappᚋmodelᚐItem(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_deleteItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -865,7 +915,7 @@ func (ec *executionContext) _Mutation_deleteItem(ctx context.Context, field grap
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteItem(rctx, args["input"].(DeleteItemInput))
+		return ec.resolvers.Mutation().DeleteItem(rctx, args["input"].(model.DeleteItemInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -912,9 +962,9 @@ func (ec *executionContext) _Query_items(ctx context.Context, field graphql.Coll
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*models.Item)
+	res := resTmp.([]*model.Item)
 	fc.Result = res
-	return ec.marshalNItem2ᚕᚖappᚋmodelsᚐItemᚄ(ctx, field.Selections, res)
+	return ec.marshalNItem2ᚕᚖappᚋmodelᚐItemᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_categories(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -947,9 +997,9 @@ func (ec *executionContext) _Query_categories(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*Category)
+	res := resTmp.([]*model.Category)
 	fc.Result = res
-	return ec.marshalNCategory2ᚕᚖappᚋgraphᚋgeneratedᚐCategoryᚄ(ctx, field.Selections, res)
+	return ec.marshalNCategory2ᚕᚖappᚋmodelᚐCategoryᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_item(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -986,9 +1036,9 @@ func (ec *executionContext) _Query_item(ctx context.Context, field graphql.Colle
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*models.Item)
+	res := resTmp.(*model.Item)
 	fc.Result = res
-	return ec.marshalOItem2ᚖappᚋmodelsᚐItem(ctx, field.Selections, res)
+	return ec.marshalOItem2ᚖappᚋmodelᚐItem(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2149,8 +2199,8 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputCreateItemInput(ctx context.Context, obj interface{}) (CreateItemInput, error) {
-	var it CreateItemInput
+func (ec *executionContext) unmarshalInputCreateItemInput(ctx context.Context, obj interface{}) (model.CreateItemInput, error) {
+	var it model.CreateItemInput
 	var asMap = obj.(map[string]interface{})
 
 	for k, v := range asMap {
@@ -2177,8 +2227,8 @@ func (ec *executionContext) unmarshalInputCreateItemInput(ctx context.Context, o
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputDeleteItemInput(ctx context.Context, obj interface{}) (DeleteItemInput, error) {
-	var it DeleteItemInput
+func (ec *executionContext) unmarshalInputDeleteItemInput(ctx context.Context, obj interface{}) (model.DeleteItemInput, error) {
+	var it model.DeleteItemInput
 	var asMap = obj.(map[string]interface{})
 
 	for k, v := range asMap {
@@ -2197,8 +2247,8 @@ func (ec *executionContext) unmarshalInputDeleteItemInput(ctx context.Context, o
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputUpdateItemInput(ctx context.Context, obj interface{}) (UpdateItemInput, error) {
-	var it UpdateItemInput
+func (ec *executionContext) unmarshalInputUpdateItemInput(ctx context.Context, obj interface{}) (model.UpdateItemInput, error) {
+	var it model.UpdateItemInput
 	var asMap = obj.(map[string]interface{})
 
 	for k, v := range asMap {
@@ -2243,7 +2293,7 @@ func (ec *executionContext) unmarshalInputUpdateItemInput(ctx context.Context, o
 
 var categoryImplementors = []string{"Category"}
 
-func (ec *executionContext) _Category(ctx context.Context, sel ast.SelectionSet, obj *Category) graphql.Marshaler {
+func (ec *executionContext) _Category(ctx context.Context, sel ast.SelectionSet, obj *model.Category) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, categoryImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -2285,7 +2335,7 @@ func (ec *executionContext) _Category(ctx context.Context, sel ast.SelectionSet,
 
 var itemImplementors = []string{"Item"}
 
-func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj *models.Item) graphql.Marshaler {
+func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj *model.Item) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, itemImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -2318,6 +2368,11 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 				}
 				return res
 			})
+		case "color":
+			out.Values[i] = ec._Item_color(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		case "createdAt":
 			out.Values[i] = ec._Item_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -2704,11 +2759,11 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNCategory2appᚋgraphᚋgeneratedᚐCategory(ctx context.Context, sel ast.SelectionSet, v Category) graphql.Marshaler {
+func (ec *executionContext) marshalNCategory2appᚋmodelᚐCategory(ctx context.Context, sel ast.SelectionSet, v model.Category) graphql.Marshaler {
 	return ec._Category(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCategory2ᚕᚖappᚋgraphᚋgeneratedᚐCategoryᚄ(ctx context.Context, sel ast.SelectionSet, v []*Category) graphql.Marshaler {
+func (ec *executionContext) marshalNCategory2ᚕᚖappᚋmodelᚐCategoryᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Category) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -2732,7 +2787,7 @@ func (ec *executionContext) marshalNCategory2ᚕᚖappᚋgraphᚋgeneratedᚐCat
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNCategory2ᚖappᚋgraphᚋgeneratedᚐCategory(ctx, sel, v[i])
+			ret[i] = ec.marshalNCategory2ᚖappᚋmodelᚐCategory(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -2745,7 +2800,7 @@ func (ec *executionContext) marshalNCategory2ᚕᚖappᚋgraphᚋgeneratedᚐCat
 	return ret
 }
 
-func (ec *executionContext) marshalNCategory2ᚖappᚋgraphᚋgeneratedᚐCategory(ctx context.Context, sel ast.SelectionSet, v *Category) graphql.Marshaler {
+func (ec *executionContext) marshalNCategory2ᚖappᚋmodelᚐCategory(ctx context.Context, sel ast.SelectionSet, v *model.Category) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -2755,12 +2810,22 @@ func (ec *executionContext) marshalNCategory2ᚖappᚋgraphᚋgeneratedᚐCatego
 	return ec._Category(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNCreateItemInput2appᚋgraphᚋgeneratedᚐCreateItemInput(ctx context.Context, v interface{}) (CreateItemInput, error) {
+func (ec *executionContext) unmarshalNColor2appᚋmodelᚐColor(ctx context.Context, v interface{}) (model.Color, error) {
+	var res model.Color
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNColor2appᚋmodelᚐColor(ctx context.Context, sel ast.SelectionSet, v model.Color) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) unmarshalNCreateItemInput2appᚋmodelᚐCreateItemInput(ctx context.Context, v interface{}) (model.CreateItemInput, error) {
 	res, err := ec.unmarshalInputCreateItemInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNDeleteItemInput2appᚋgraphᚋgeneratedᚐDeleteItemInput(ctx context.Context, v interface{}) (DeleteItemInput, error) {
+func (ec *executionContext) unmarshalNDeleteItemInput2appᚋmodelᚐDeleteItemInput(ctx context.Context, v interface{}) (model.DeleteItemInput, error) {
 	res, err := ec.unmarshalInputDeleteItemInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -2780,11 +2845,11 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 	return res
 }
 
-func (ec *executionContext) marshalNItem2appᚋmodelsᚐItem(ctx context.Context, sel ast.SelectionSet, v models.Item) graphql.Marshaler {
+func (ec *executionContext) marshalNItem2appᚋmodelᚐItem(ctx context.Context, sel ast.SelectionSet, v model.Item) graphql.Marshaler {
 	return ec._Item(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNItem2ᚕᚖappᚋmodelsᚐItemᚄ(ctx context.Context, sel ast.SelectionSet, v []*models.Item) graphql.Marshaler {
+func (ec *executionContext) marshalNItem2ᚕᚖappᚋmodelᚐItemᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Item) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -2808,7 +2873,7 @@ func (ec *executionContext) marshalNItem2ᚕᚖappᚋmodelsᚐItemᚄ(ctx contex
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNItem2ᚖappᚋmodelsᚐItem(ctx, sel, v[i])
+			ret[i] = ec.marshalNItem2ᚖappᚋmodelᚐItem(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -2821,7 +2886,7 @@ func (ec *executionContext) marshalNItem2ᚕᚖappᚋmodelsᚐItemᚄ(ctx contex
 	return ret
 }
 
-func (ec *executionContext) marshalNItem2ᚖappᚋmodelsᚐItem(ctx context.Context, sel ast.SelectionSet, v *models.Item) graphql.Marshaler {
+func (ec *executionContext) marshalNItem2ᚖappᚋmodelᚐItem(ctx context.Context, sel ast.SelectionSet, v *model.Item) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -2861,7 +2926,7 @@ func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel as
 	return res
 }
 
-func (ec *executionContext) unmarshalNUpdateItemInput2appᚋgraphᚋgeneratedᚐUpdateItemInput(ctx context.Context, v interface{}) (UpdateItemInput, error) {
+func (ec *executionContext) unmarshalNUpdateItemInput2appᚋmodelᚐUpdateItemInput(ctx context.Context, v interface{}) (model.UpdateItemInput, error) {
 	res, err := ec.unmarshalInputUpdateItemInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -3119,7 +3184,7 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return graphql.MarshalBoolean(*v)
 }
 
-func (ec *executionContext) marshalOItem2ᚖappᚋmodelsᚐItem(ctx context.Context, sel ast.SelectionSet, v *models.Item) graphql.Marshaler {
+func (ec *executionContext) marshalOItem2ᚖappᚋmodelᚐItem(ctx context.Context, sel ast.SelectionSet, v *model.Item) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

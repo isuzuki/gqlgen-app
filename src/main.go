@@ -3,7 +3,7 @@ package main
 import (
 	"app/graph"
 	"app/graph/generated"
-	"app/models"
+	"app/model"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"log"
@@ -38,7 +38,7 @@ func initDB() {
 	}
 
 	db.LogMode(true)
-	db.AutoMigrate(&models.Item{})
+	db.AutoMigrate(&model.Item{})
 
 	defer db.Close()
 }
